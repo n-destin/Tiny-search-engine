@@ -1,0 +1,19 @@
+bash testing.sh
+mkdir: cannot create directory 'testing.out': File exists
+testing.sh: line 5: testing.out/output.log: Not a directory
+Testing with out of range: Greater than 10: 15
+The depth 15 is out of range 
+Depth should be between 0 and 10
+Testing with out of range: Less than 0: -10
+The depth -10 is out of range 
+Depth should be between 0 and 10
+Testing with an unavailable directory
+Failed to create .crawler file in directory '../WAKAKAKA'
+The directory not found
+Testing with few number of arguments
+Something went wrongFew number of parameters
+Testing with Broken Link
+Something went wrongWe can't crawl the website
+Testing with many number of arguments
+Something went wrongMany parameters
+Scraping The website: http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Linked_list.html at depths 0,1,3
