@@ -8,12 +8,14 @@ VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
 
 LIBS = ../libcs50/libcs50-given.a
 LIB = commonlib.a
-OBJS = pagedir.o
+OBJS = pagedir.o word.o index.o
 
 $(LIB): $(OBJS)
 	ar cr $(LIB) $(OBJS)
 
 pagedir.o: pagedir.h
+index.o : index.h
+word.o: word.h
 
 clean:
 	rm -f *~ *.o

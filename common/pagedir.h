@@ -30,4 +30,13 @@ bool pagedir_init(const char *pageDirectory) ;
 * We add the file to the directory if it is there
  */
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID);
-#endif // __PAGEDIR_H
+
+// Validates that a directory contains a .crawler file indicating it was initialized for crawling
+int pagedir_validate(const char* pageDirectory);
+
+char* get_pathname(char* pageDirectory, const char* id);
+
+// Loads a webpage from a file
+webpage_t* pagedir_load(const char* filename);
+
+#endif // WEBPAGEDIR_H

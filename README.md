@@ -1,5 +1,5 @@
 # CS50 TSE
-## Student name (GitHub username)
+## Destin Niyomufasha(n-destin)
 
 The assignment and Specs are in a [public repo](https://github.com/CS50DartmouthSPS24/labs/tse).
 Do not clone that repo; view it on GitHub.

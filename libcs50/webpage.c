@@ -36,7 +36,7 @@ struct URL {
   char* fragment;             // #top
 };
 
-/* webpage_t: structure to represent a web page, and its contents.
+/* webpage_t: structure to represent a web page, and its cofntents.
  * The innards should not be visible to users of the webpage module.
  */
 typedef struct webpage {
