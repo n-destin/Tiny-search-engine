@@ -13,7 +13,7 @@
 /* Returns the number of lines in the given file,
  * i.e., the number of newlines in the file.
  * (If the file does not end with a newline, it will undercount by one.)
- * On return, the file pointer is back to beginning of file.
+ * On return,f the file pointer is back to beginning of file.
  * This will not work for pipes or stdin when it is attached to keyboard.
  */
 int file_numLines(FILE* fp);

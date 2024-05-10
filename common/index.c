@@ -97,7 +97,7 @@ bool index_insert(index_t *index, const char *key, void *item) {
 }
 
 // Find a word's counters in the index
-void *index_find(index_t *index, const char *key) {
+void * index_find(index_t *index, const char *key) {
     return hashtable_find(index->ht, key);
 }
 

@@ -1,10 +1,8 @@
 /*
     Destin Niyomufasha
     CS 50 word.c file tse
-    Containing the word processing functions
+    Containing the word processing function
 */
-
-
 
 #include "word.h"
 #include <ctype.h>

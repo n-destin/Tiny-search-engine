@@ -4,6 +4,7 @@
 #include "../libcs50/hashtable.h"
 
 typedef struct index index_t; 
+typedef struct counters counters_t;
 
 index_t* index_new(int num_slots);
 
