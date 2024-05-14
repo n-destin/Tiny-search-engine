@@ -30,8 +30,9 @@ typedef struct index {
 
 
 typedef struct searchResult{   
-    char * page;
-    int count;
+    int page;
+    int rank;
+    char* URL;
 } searchResult_t;
 
 
@@ -62,9 +63,9 @@ void validate_args(int argc, char* argv[]) {
     }
 }
 
-void printsomething(void* arg, const int key, const int item){
-    printf("I reached here");
-    printf(arg, "%d %d \n", key, item);
+void count_elements(void* arg, const int key, const int item){
+    int* count = (int*) arg;
+    *count += 1;
 }
 
 void copy(void* arg, const int key, const int count)
@@ -119,12 +120,14 @@ void counters_union_helper(void * arg, int key, int count)
 {   
     FILE* file = fopen("./naming", "w");
     counters_t * counters_union = (counters_t*) arg;
-    printf("%d  %d\n", count, counters_get(counters_union, key));
+    // printf("%d  %d\n", count, counters_get(counters_union, key));
     int new_count = counters_get(counters_union, key) + count;
     counters_set(counters_union, key, new_count);
     counters_print(counters_union, file);
     fclose(file);
 }
+
+
 
 
 void counters_union(counters_t * counters_one, counters_t* counters_two){
@@ -145,9 +148,6 @@ void add_result(void* arg, const int key, const int count1) {
     }
 }
 
-void print_counters(counters_t * counter, int key, int count){
-    printf("%d, %d", key, count);
-}
 
 counters_t* counters_intersection(counters_t* counters_one, counters_t* counters_two) {
     counters_t* intersection = counters_new();
@@ -160,6 +160,68 @@ counters_t* counters_intersection(counters_t* counters_one, counters_t* counters
     args->intersection = intersection;
     counters_iterate(counters_one, args, add_result);
     return args->intersection;
+}
+
+void append(void* arg, int key, int count)
+{
+    int* array = (int*) arg;
+    int index = array[0] + 1;
+    array[index] = key;
+    array[index + 1] = count;
+    array[0] = index + 1;
+}
+
+int* get_results_array(counters_t* results)
+{
+    int* counters_array = malloc(MAX_QUERY_LENGTH * sizeof(int));
+    if (counters_array == NULL) {
+        return NULL; // Handle malloc failure
+    }
+    counters_array[0] = 0;
+    counters_iterate(results, counters_array, append);
+    return counters_array;
+}
+
+int compareByRank(const void *a, const void *b) {
+    searchResult_t *resultB = (searchResult_t *)b;
+    searchResult_t *resultA = (searchResult_t *)a;
+    return (resultA->rank - resultB->rank);
+}
+
+char* get_url(int page, const char* pageDirectory) {
+    char filename[16];
+    sprintf(filename, "%d", page);
+    char* pathname = get_pathname(pageDirectory, filename);
+    FILE* file = fopen(pathname, "r");
+    if (file == NULL) {
+        printf("here error jappend");
+        fprintf(stderr, "Failed to open file");
+        return NULL;
+    }
+
+    char* URL = malloc(1024);
+    URL = file_readLine(file);
+    fclose(file);
+    return URL;
+}
+
+
+
+// Function to convert the array into search results and sort them
+searchResult_t* getSortedResults(int* counters_array, int array_length, const char* pageDirectory) {
+    int n = array_length * 2; // Calculate the number of search results
+    searchResult_t* results = malloc(n * sizeof(searchResult_t));
+    if (results == NULL) {
+        return NULL; // Handle memory allocation failure
+    }
+    for (int i = 1; i <= n; i+=2) {
+        results[i].page = counters_array[i];
+        results[i].rank = counters_array[i+1];
+        results[i].URL = get_url(results[i].page, pageDirectory);
+    }
+    qsort(results, n, sizeof(searchResult_t), compareByRank);
+
+    return results;
 }
 
 
@@ -191,20 +253,34 @@ int main(int argc, char *argv[]) {
         while (word != NULL) {
             // printf("%s \n", word);
             if(strcmp(word, "and") != 0){
+                word_normalize(word);
                 words[num_words++] = word;
             }
             word = strtok(NULL, " \n\t");
         }
-
         // for(int i = 0; i<num_words; i++){
         //     printf("word: %s \n", words[i]);
         // }        
         FILE* file = fopen("./named", "w");
         //counters_t * something = index_find f(indexLoad, "dartmouth");
-        counters_t *results = or_sequence(indexLoad, words, num_words);
+        counters_t *results = or_sequence(indexLoad, words, num_words); // got the counter - unsorted
+        int num_results = 0;
+        counters_iterate(results, &num_results, count_elements);
+        // printf("The count is: %d", num_results);
+        // Helper function to compare two search results by rank
+        int* results_array = get_results_array(results);
+        searchResult_t* sorted_results = getSortedResults(results_array, num_results, pageDirectory);
+        for(int i = 0; i< num_results; i++){
+            printf("%d %d %s\n", sorted_results[i].page, sorted_results[i].rank, sorted_results[i].URL);
+        }
+        // for(int i = 0; i< MAX_QUERY_LENGTH; i++){
+        //     printf("%d", results_array[i]->key);
+        // }
+        // sorting the results
+        // counters_iterate(results, )
         counters_print(results, file);
         fclose(file);
-        counters_delete(results);
+        // counters_delete(results);
     }
     // index_delete(indexLoad);
     return 0;
