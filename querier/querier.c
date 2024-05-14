@@ -96,6 +96,31 @@ counters_t* and_sequence(index_t * index, char **words, int start, int end) {
 
 
 counters_t* or_sequence(index_t *index, char **words, int num_words) {
+    
+    if(strcmp(words[0], "and") == 0){
+        printf("\'and\' cannot start \n");
+        return NULL;
+    }
+    if(strcmp(words[0], "or") == 0)
+    {
+        printf("\'or\' cannot start \n");
+        return NULL;
+    }
+    int j = 0;
+    for(int i = 0; i<num_words - 1; i++){
+        if((strcmp(words[i], "and") == 0 && strcmp(words[i + 1], "or") == 0) || (strcmp(words[i + 1], "and") == 0 && strcmp(words[i], "or") == 0)){
+            printf("\'or\' and \'and\' cannot be on the next to each other \n");
+            return NULL;
+        }
+        if (strcmp(words[i], "and") != 0) {
+            words[j++] = words[i];  // Copy the pointer if it's not "and"
+        }
+    }
+    for (int i = j; i < num_words - 1; i++) {
+        words[i] = NULL;
+    }
+
+    // words = another_one;
     counters_t *result = counters_new();
     if(result == NULL){
         exit(1);
@@ -252,10 +277,8 @@ int main(int argc, char *argv[]) {
         char *word = strtok(query, " \n\t");
         while (word != NULL) {
             // printf("%s \n", word);
-            if(strcmp(word, "and") != 0){
-                word_normalize(word);
-                words[num_words++] = word;
-            }
+            word_normalize(word);
+            words[num_words++] = word;
             word = strtok(NULL, " \n\t");
         }
         // for(int i = 0; i<num_words; i++){
@@ -264,22 +287,25 @@ int main(int argc, char *argv[]) {
         FILE* file = fopen("./named", "w");
         //counters_t * something = index_find f(indexLoad, "dartmouth");
         counters_t *results = or_sequence(indexLoad, words, num_words); // got the counter - unsorted
-        int num_results = 0;
-        counters_iterate(results, &num_results, count_elements);
-        // printf("The count is: %d", num_results);
-        // Helper function to compare two search results by rank
-        int* results_array = get_results_array(results);
-        searchResult_t* sorted_results = getSortedResults(results_array, num_results, pageDirectory);
-        for(int i = 0; i< num_results; i++){
-            printf("%d %d %s\n", sorted_results[i].page, sorted_results[i].rank, sorted_results[i].URL);
+        if(results != NULL){
+            int num_results = 0;
+            counters_iterate(results, &num_results, count_elements);
+            // printf("The count is: %d", num_results);
+            // Helper function to compare two search results by rank
+            int* results_array = get_results_array(results);
+            searchResult_t* sorted_results = getSortedResults(results_array, num_results, pageDirectory);
+            for(int i = 0; i< num_results; i++){
+                printf("%d %d %s\n", sorted_results[i].page, sorted_results[i].rank, sorted_results[i].URL);
+            }
+            // for(int i = 0; i< MAX_QUERY_LENGTH; i++){
+            //     printf("%d", results_array[i]->key);
+            // }
+            // sorting the results
+            // counters_iterate(results, )
+            counters_print(results, file);
+            fclose(file);
         }
-        // for(int i = 0; i< MAX_QUERY_LENGTH; i++){
-        //     printf("%d", results_array[i]->key);
-        // }
-        // sorting the results
-        // counters_iterate(results, )
-        counters_print(results, file);
-        fclose(file);
+        
         // counters_delete(results);
     }
     // index_delete(indexLoad);

@@ -31,5 +31,3 @@ valgrind: $(EXEC)
 
 test: $(EXEC)
 	bash testing.sh
-
-
